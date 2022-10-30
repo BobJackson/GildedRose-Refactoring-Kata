@@ -5,88 +5,40 @@ public class Item {
     public int sellIn;
     public int quality;
 
-    public static Item createBackstagePass(int sellIn, int quality) {
-        return new Item("Backstage passes to a TAFKAL80ETC concert", sellIn, quality);
-    }
-
-    public static Item createSulfuras(int sellIn, int quality) {
-        return new Item("Sulfuras, Hand of Ragnaros", sellIn, quality);
-    }
-
-    public static Item createAgedBrie(int sellIn, int quality) {
-        return new Item("Aged Brie", sellIn, quality);
-    }
-
-    public static Item createNormal(String name, int sellIn, int quality) {
-        return new Item(name, sellIn, quality);
-    }
-
     public Item(String name, int sellIn, int quality) {
         this.name = name;
         this.sellIn = sellIn;
         this.quality = quality;
     }
 
-    void updateQuality() {
-        if (!isAgedBrie() && !isBackstagePass()) {
-            if (quality > 0) {
-                if (!isSulfuras()) {
-                    quality = quality - 1;
-                }
-            }
-        } else {
-            if (quality < 50) {
-                quality = quality + 1;
-
-                if (isBackstagePass()) {
-                    if (sellIn < 11) {
-                        if (quality < 50) {
-                            quality = quality + 1;
-                        }
-                    }
-
-                    if (sellIn < 6) {
-                        if (quality < 50) {
-                            quality = quality + 1;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (!isSulfuras()) {
-            sellIn = sellIn - 1;
-        }
-
-        if (sellIn < 0) {
-            if (!isAgedBrie()) {
-                if (!isBackstagePass()) {
-                    if (quality > 0) {
-                        if (!isSulfuras()) {
-                            quality = quality - 1;
-                        }
-                    }
-                } else {
-                    quality = 0;
-                }
-            } else {
-                if (quality < 50) {
-                    quality = quality + 1;
-                }
-            }
+    void passOneDay() {
+        decreaseSellIn();
+        updateQuality();
+        if (isExpired()) {
+            updateQualityAfterExpiration();
         }
     }
 
-    private boolean isAgedBrie() {
-        return name.equals("Aged Brie");
+    protected void decreaseSellIn() {
+        sellIn = sellIn - 1;
     }
 
-    private boolean isBackstagePass() {
-        return name.equals("Backstage passes to a TAFKAL80ETC concert");
+    protected void updateQuality() {
+        decreaseQuality();
     }
 
-    private boolean isSulfuras() {
-        return name.equals("Sulfuras, Hand of Ragnaros");
+    protected void updateQualityAfterExpiration() {
+        decreaseQuality();
+    }
+
+    private void decreaseQuality() {
+        if (quality > 0) {
+            quality = quality - 1;
+        }
+    }
+
+    private boolean isExpired() {
+        return sellIn < 0;
     }
 
     @Override
